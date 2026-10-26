@@ -307,6 +307,10 @@ export default function HUD({
 
   const isHidden = selectedProject !== null
   const currentProject = projects[activeIndex] || projects[0]
+  const initialProgress = typeof scrollStateRef?.current?.progress === 'number'
+    ? scrollStateRef.current.progress
+    : (activeIndex / (projects.length - 1))
+  const scrollPct = Math.min(100, Math.max(0, initialProgress * 100))
 
   return (
     <div className={`hud-root ${isHidden ? 'hud-hidden' : ''}`}>
