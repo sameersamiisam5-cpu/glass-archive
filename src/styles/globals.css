@@ -786,16 +786,8 @@ button {
 }
 
 .custom-cursor-container {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.custom-cursor-container.visible {
-  opacity: 1;
+  display: none !important;
+  pointer-events: none !important;
 }
 
 .cursor-dot {

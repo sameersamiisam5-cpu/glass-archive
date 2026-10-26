@@ -7,7 +7,6 @@ import ProjectUI from './components/ProjectUI.jsx'
 import ProjectDetails from './components/ProjectDetails.jsx'
 import Intro from './components/Intro.jsx'
 import HUD from './components/HUD.jsx'
-import CustomCursor from './components/CustomCursor.jsx'
 import ArchiveIndexTray from './components/ArchiveIndexTray.jsx'
 import { useSteppedDolly } from './hooks/useSteppedDolly.js'
 import { soundscape } from './utils/audio.js'
@@ -242,13 +241,6 @@ export default function App() {
         introVisible={introVisible}
         viewMode={viewMode}
         onJumpToProject={handleJumpToProject}
-      />
-
-      {/* Awwwards Custom Magnetic Cursor */}
-      <CustomCursor
-        hoveredIndex={hoveredIndex}
-        selectedProject={selectedProject}
-        cursorMode={cursorMode}
       />
 
       {/* Three.js canvas — fixed fullscreen */}

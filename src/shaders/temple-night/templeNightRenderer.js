@@ -1062,7 +1062,7 @@ const HI = qs('q', COARSE ? 'low' : 'high');
 const LOW = HI === 'low';
 const WANT_POST    = qs('post', '1') !== '0';
 const WANT_SHADOW  = qs('shadow', LOW ? '0' : '1') !== '0';
-const DPR_CAP      = Math.min(qn('dpr', LOW ? 1.0 : 1.35), 1.35);
+const DPR_CAP      = Math.min(qn('dpr', LOW ? 1.0 : 1.25), 1.25);
 /* the renderer trades resolution for frame rate on its own — the scene is
    fill-bound (five big alpha-blended veils plus a bloom chain), so pixels
    are the only knob worth turning on unknown hardware */
@@ -2126,7 +2126,7 @@ function buildLights() {
   key.target.position.set(0, 2.2, -12.5); scene.add(key.target);
   if (WANT_SHADOW) {
     key.castShadow = true;
-    const S = LOW ? 1024 : 2048;
+    const S = 1024;
     key.shadow.mapSize.set(S, S);
     const c = key.shadow.camera;
     c.left = -26; c.right = 26; c.top = 34; c.bottom = -16; c.near = 3; c.far = 78;
@@ -2182,9 +2182,9 @@ function initPost() {
   if (!WANT_POST) return;
   const w = renderer.domElement.width, h = renderer.domElement.height;
   const O = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, type: THREE.HalfFloatType, depthBuffer: false, stencilBuffer: false };
-  POST.scene = new THREE.WebGLRenderTarget(w, h, Object.assign({}, O, { depthBuffer: true, samples: LOW ? 0 : 2 }));
+  POST.scene = new THREE.WebGLRenderTarget(w, h, Object.assign({}, O, { depthBuffer: true, samples: 0 }));
   let lw = Math.max(2, w >> 1), lh = Math.max(2, h >> 1);
-  const N = 4;
+  const N = 2;
   for (let i = 0; i < N; i++) {
     POST.levels.push({ a: new THREE.WebGLRenderTarget(lw, lh, O), b: new THREE.WebGLRenderTarget(lw, lh, O), w: lw, h: lh });
     lw = Math.max(2, lw >> 1); lh = Math.max(2, lh >> 1);
@@ -2345,8 +2345,7 @@ function resize() {
   }
   /* multisampling is the first thing to go when the budget tightens */
   if (POST.scene) {
-    const want = (!LOW && PERF.scale > .78) ? 2 : 0;
-    if (POST.scene.samples !== want) { POST.scene.samples = want; POST.scene.dispose(); }
+    if (POST.scene.samples !== 0) { POST.scene.samples = 0; POST.scene.dispose(); }
   }
   if (WANT_SHADOW && WORLD.key) WORLD.key.shadow.needsUpdate = true;
   if (WORLD.embers) WORLD.embers.material.uniforms.uSize.value = h * renderer.getPixelRatio() * .5;

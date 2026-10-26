@@ -19,6 +19,8 @@ export default function EditorialWatermark({
   const mousePos = useRef({ x: 0, y: 0 })
   const smoothMouse = useRef({ x: 0, y: 0 })
   const smoothTrackRef = useRef(activeIndex)
+  const lastTrackRef = useRef(-999)
+  const lastMouseRef = useRef({ x: -999, y: -999 })
   const lastChimedIdx = useRef(activeIndex)
   const [activeIdx, setActiveIdx] = useState(activeIndex)
 
@@ -113,24 +115,33 @@ export default function EditorialWatermark({
       smoothMouse.current.x += (mousePos.current.x - smoothMouse.current.x) * 0.06
       smoothMouse.current.y += (mousePos.current.y - smoothMouse.current.y) * 0.06
 
-      if (containerRef.current) {
-        const xOff = smoothMouse.current.x * -14
-        const yOff = smoothMouse.current.y * -10
-        containerRef.current.style.transform = `translate3d(${xOff.toFixed(1)}px, ${yOff.toFixed(1)}px, 0)`
-      }
+      // Only update DOM styles when position or track has actually moved
+      const trackDiff = Math.abs(curTrack - lastTrackRef.current)
+      const mouseDiff = Math.hypot(smoothMouse.current.x - lastMouseRef.current.x, smoothMouse.current.y - lastMouseRef.current.y)
 
-      if (viewModeRef.current === 'orbit') {
-        // In 3D Orbit mode: apply real-time interactive 3D projectile curve tilt
-        if (orbitTrackRef.current) {
-          const rotY = smoothMouse.current.x * 14
-          const rotX = -smoothMouse.current.y * 9
-          orbitTrackRef.current.style.transform = `rotateY(${rotY.toFixed(2)}deg) rotateX(${rotX.toFixed(2)}deg)`
+      if (trackDiff > 0.0003 || mouseDiff > 0.0003) {
+        lastTrackRef.current = curTrack
+        lastMouseRef.current = { x: smoothMouse.current.x, y: smoothMouse.current.y }
+
+        if (containerRef.current) {
+          const xOff = smoothMouse.current.x * -14
+          const yOff = smoothMouse.current.y * -10
+          containerRef.current.style.transform = `translate3d(${xOff.toFixed(1)}px, ${yOff.toFixed(1)}px, 0)`
         }
-      } else {
-        // In Corridor mode: update layers directly on DOM (0 React re-renders during active scrolling)
-        for (let i = 0; i < total; i++) {
-          applyLayerStyle(titleLayersRef.current[i], i, curTrack, 16)
-          applyLayerStyle(kanjiLayersRef.current[i], i, curTrack, 20)
+
+        if (viewModeRef.current === 'orbit') {
+          // In 3D Orbit mode: apply real-time interactive 3D projectile curve tilt
+          if (orbitTrackRef.current) {
+            const rotY = smoothMouse.current.x * 14
+            const rotX = -smoothMouse.current.y * 9
+            orbitTrackRef.current.style.transform = `rotateY(${rotY.toFixed(2)}deg) rotateX(${rotX.toFixed(2)}deg)`
+          }
+        } else {
+          // In Corridor mode: update layers directly on DOM (0 React re-renders during active scrolling)
+          for (let i = 0; i < total; i++) {
+            applyLayerStyle(titleLayersRef.current[i], i, curTrack, 16)
+            applyLayerStyle(kanjiLayersRef.current[i], i, curTrack, 20)
+          }
         }
       }
 

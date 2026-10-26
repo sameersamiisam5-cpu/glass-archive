@@ -5,9 +5,9 @@ import { projects } from '../data/projects.js'
 import { lerp } from '../utils/animation.js'
 import { soundscape } from '../utils/audio.js'
 
-const EMBER_COUNT_DESKTOP = 180
-const EMBER_COUNT_MOBILE  = 90
-const MAX_DPR             = 1.5
+const EMBER_COUNT_DESKTOP = 100
+const EMBER_COUNT_MOBILE  = 50
+const MAX_DPR             = 1.25
 
 /**
  * Procedurally generates a glowing circular ember sprite with
@@ -116,7 +116,7 @@ export default function ArchiveScene({
     // ── Transparent WebGL Renderer (Optimized for 60+ FPS) ──
     const renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: true,
+      antialias: false,
       alpha: true,
       powerPreference: 'high-performance',
       stencil: false,
