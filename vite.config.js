@@ -11,4 +11,15 @@ export default defineConfig({
       '@designcodeio/threeui': path.resolve(__dirname, 'src/shaders/temple-night/TempleNightScene.tsx'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          three: ['three'],
+          vendor: ['react', 'react-dom', 'gsap'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
 })

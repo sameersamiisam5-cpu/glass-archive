@@ -184,7 +184,7 @@ button {
 /* ── Smooth Single Morphing Watermark Typography ───────────────────────────── */
 .morph-layer {
   grid-area: 1 / 1;
-  will-change: transform, filter, opacity;
+  will-change: transform, opacity;
   pointer-events: none;
 }
 
@@ -469,7 +469,7 @@ button {
   pointer-events: auto;
   cursor: pointer;
   transform-style: preserve-3d;
-  will-change: transform, filter, opacity;
+  will-change: transform, opacity;
   transition:
     transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
     filter 0.4s ease,
@@ -2063,6 +2063,8 @@ button {
   opacity: 0 !important;
   pointer-events: none !important;
   visibility: hidden !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .intro-content {
@@ -2077,37 +2079,34 @@ button {
   border-radius: 30px;
   border: 1.5px solid rgba(215, 185, 125, 0.42);
   box-shadow:
-    0 30px 90px rgba(0, 0, 0, 0.92),
-    0 0 50px rgba(215, 60, 45, 0.25),
-    inset 0 1px 1px rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+    0 30px 90px rgba(0, 0, 0, 0.95),
+    0 0 50px rgba(215, 185, 125, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   pointer-events: auto;
   overflow: hidden;
-  background: #050914;
+  background: radial-gradient(circle at 50% 30%, #0c1424 0%, #050914 70%, #02040a 100%);
 }
 
-/* 40% Brighter Artwork Layer */
+/* Elegant Nocturnal Smoked Glass Film — No Pink / Floral Overlays */
 .intro-content::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 30px;
-  background: url('/sanctuary-card-bg.jpg') center center / cover no-repeat;
-  filter: brightness(1.4) contrast(1.08);
+  background: radial-gradient(circle at 50% 0%, rgba(215, 185, 125, 0.08) 0%, transparent 60%);
   pointer-events: none;
   z-index: 1;
 }
 
-/* Light Sheer Smoked Glass Film for Text Legibility */
 .intro-content::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 30px;
   background:
-    linear-gradient(180deg, rgba(7, 12, 22, 0.38) 0%, rgba(5, 8, 16, 0.22) 48%, rgba(4, 6, 12, 0.58) 100%),
-    radial-gradient(circle at 50% 50%, transparent 45%, rgba(2, 4, 8, 0.45) 100%);
+    linear-gradient(180deg, rgba(7, 12, 22, 0.5) 0%, rgba(4, 6, 12, 0.8) 100%);
   pointer-events: none;
   z-index: 1;
 }

@@ -1062,7 +1062,7 @@ const HI = qs('q', COARSE ? 'low' : 'high');
 const LOW = HI === 'low';
 const WANT_POST    = qs('post', '1') !== '0';
 const WANT_SHADOW  = qs('shadow', LOW ? '0' : '1') !== '0';
-const DPR_CAP      = Math.min(qn('dpr', LOW ? 1.25 : 1.5), 1.5);
+const DPR_CAP      = Math.min(qn('dpr', LOW ? 1.0 : 1.35), 1.35);
 /* the renderer trades resolution for frame rate on its own — the scene is
    fill-bound (five big alpha-blended veils plus a bloom chain), so pixels
    are the only knob worth turning on unknown hardware */
@@ -2426,12 +2426,12 @@ function renderFrame(now) {
   clock += dt;
   fadeIn = 1;
 
-  if (!PERF.locked && clock > 2.2) {
+  if (!PERF.locked && clock > 0.8) {
     PERF.acc += raw; PERF.n++;
-    if (PERF.n >= 40 || PERF.acc > .9) {
+    if (PERF.n >= 20 || PERF.acc > .4) {
       const avg = PERF.acc / PERF.n; PERF.acc = 0; PERF.n = 0;
-      if (avg > .0230 && PERF.scale > .55) { PERF.scale = Math.max(.55, PERF.scale * (avg > .05 ? .64 : .85)); resize(); }
-      else if (avg < .0138 && PERF.scale < 1) { PERF.scale = Math.min(1, PERF.scale + .08); resize(); }
+      if (avg > .0166 && PERF.scale > .55) { PERF.scale = Math.max(.55, PERF.scale * (avg > .030 ? .78 : .90)); resize(); }
+      else if (avg < .0135 && PERF.scale < 1) { PERF.scale = Math.min(1, PERF.scale + .05); resize(); }
     }
   }
 

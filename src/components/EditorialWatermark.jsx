@@ -4,7 +4,6 @@ import { soundscape } from '../utils/audio.js'
 
 export default function EditorialWatermark({
   activeIndex = 0,
-  scrollProgress = 0,
   scrollStateRef,
   selectedProject,
   onProjectClick,
@@ -102,7 +101,7 @@ export default function EditorialWatermark({
         return
       }
 
-      const targetProgress = scrollStateRef?.current?.progress ?? scrollProgress
+      const targetProgress = scrollStateRef?.current?.progress ?? 0
       const velocity = scrollStateRef?.current?.velocity ?? 0
       const targetTrack = targetProgress * (total - 1)
 
@@ -135,11 +134,10 @@ export default function EditorialWatermark({
         }
       }
 
-      // Harmonic singing bowl chime on crossing project threshold
+      // Sync active project on crossing project threshold without triggering double soundscape chime
       const closestIdx = Math.min(total - 1, Math.max(0, Math.round(curTrack)))
       if (closestIdx !== lastChimedIdx.current && Math.abs(velocity) > 0.001) {
         lastChimedIdx.current = closestIdx
-        soundscape.playGlassChime(closestIdx)
         setActiveIdx(closestIdx)
       }
 
@@ -163,7 +161,7 @@ export default function EditorialWatermark({
       document.removeEventListener('visibilitychange', onVisibility)
       if (rafId) cancelAnimationFrame(rafId)
     }
-  }, [isHidden, scrollProgress, scrollStateRef])
+  }, [isHidden, scrollStateRef])
 
   const activeProject = projects[activeIdx] || projects[0]
 

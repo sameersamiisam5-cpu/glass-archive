@@ -113,17 +113,24 @@ export default function ArchiveScene({
     if (!canvas) return
     const s = stateRef.current
 
-    // ── Transparent WebGL Renderer ──
+    // ── Transparent WebGL Renderer (Optimized for 60+ FPS) ──
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
       alpha: true,
       powerPreference: 'high-performance',
+      stencil: false,
+      depth: false,
     })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_DPR))
+    const initialDpr = Math.min(window.devicePixelRatio || 1, MAX_DPR)
+    renderer.setPixelRatio(initialDpr)
     renderer.setSize(window.innerWidth, window.innerHeight)
     renderer.setClearColor(0x000000, 0)
     s.renderer = renderer
+    s.currentDpr = initialDpr
+    s.lastTime = performance.now()
+    s.perfAcc = 0
+    s.perfFrames = 0
 
     // ── Atmospheric Scene ──
     const scene = new THREE.Scene()
@@ -324,6 +331,27 @@ export default function ArchiveScene({
 
     const { renderer, scene, camera, particleGeo, count } = s
     if (!renderer || !scene || !camera || !particleGeo) return
+
+    const now = performance.now()
+    if (s.lastTime) {
+      const delta = now - s.lastTime
+      s.perfAcc = (s.perfAcc || 0) + delta
+      s.perfFrames = (s.perfFrames || 0) + 1
+      if (s.perfFrames >= 30) {
+        const avgFrame = s.perfAcc / s.perfFrames
+        s.perfAcc = 0
+        s.perfFrames = 0
+        // If average frame time exceeds 16.6ms (under 60 FPS), dynamically scale resolution
+        if (avgFrame > 16.6 && s.currentDpr > 1.0) {
+          s.currentDpr = Math.max(1.0, s.currentDpr - 0.15)
+          renderer.setPixelRatio(s.currentDpr)
+        } else if (avgFrame < 13.0 && s.currentDpr < MAX_DPR) {
+          s.currentDpr = Math.min(MAX_DPR, s.currentDpr + 0.1)
+          renderer.setPixelRatio(s.currentDpr)
+        }
+      }
+    }
+    s.lastTime = now
 
     const t = s.clock.getElapsedTime()
     const { progress, velocity } = scrollStateRef.current

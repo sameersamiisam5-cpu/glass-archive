@@ -20,7 +20,6 @@ gsap.registerPlugin(ScrollTrigger)
 export default function App() {
   const canvasRef = useRef(null)
   const scrollStateRef = useRef({ progress: 0, velocity: 0 })
-  const [scrollProgress, setScrollProgress] = useState(0)
   const [activeIndex, setActiveIndex] = useState(0)
   const [hoveredIndex, setHoveredIndex] = useState(-1)
   const [selectedProject, setSelectedProject] = useState(null)
@@ -48,16 +47,15 @@ export default function App() {
     return () => clearTimeout(timer)
   }, [])
 
-  // ── Stepped Cinematic Dolly Scroll Engine (Replaces Lenis) ────────────────
+  // ── Stepped Cinematic Dolly Scroll Engine (60+ FPS Zero-Rerender Tracking) ──
   const dollyRef = useSteppedDolly(({ progress, velocity, targetIndex }) => {
     scrollStateRef.current.progress = progress
     scrollStateRef.current.velocity = velocity
-    setScrollProgress(progress)
 
     const computedIdx = typeof targetIndex === 'number'
       ? targetIndex
       : Math.min(projects.length - 1, Math.max(0, Math.round(progress * (projects.length - 1))))
-    setActiveIndex(computedIdx)
+    setActiveIndex((prev) => (prev === computedIdx ? prev : computedIdx))
   }, {
     totalSteps: projects.length,
     introVisible,
@@ -89,7 +87,6 @@ export default function App() {
   const handleJumpToProject = useCallback((idx) => {
     const targetProgress = idx / (projects.length - 1)
     scrollStateRef.current.progress = targetProgress
-    setScrollProgress(targetProgress)
     setActiveIndex(idx)
 
     if (dollyRef.current) {
@@ -100,12 +97,11 @@ export default function App() {
 
   const handleScrub = useCallback((targetProgress) => {
     scrollStateRef.current.progress = targetProgress
-    setScrollProgress(targetProgress)
     const computedIdx = Math.min(
       projects.length - 1,
       Math.max(0, Math.round(targetProgress * (projects.length - 1)))
     )
-    setActiveIndex(computedIdx)
+    setActiveIndex((prev) => (prev === computedIdx ? prev : computedIdx))
 
     if (dollyRef.current) {
       dollyRef.current.scrubTo(targetProgress, true)
@@ -230,36 +226,6 @@ export default function App() {
     handleTriggerReload,
   ])
 
-  // Forward pointer moves to TempleNightScene canvas for interactive pointer wisps (RAF Throttled for 60+ FPS)
-  useEffect(() => {
-    let target = null
-    let ticking = false
-    let lastX = 0
-    let lastY = 0
-
-    const forwardPointer = (e) => {
-      if (!e.isTrusted) return
-      lastX = e.clientX
-      lastY = e.clientY
-      if (!ticking) {
-        ticking = true
-        requestAnimationFrame(() => {
-          if (!target) target = document.querySelector('.temple-night-canvas')
-          if (target) {
-            target.dispatchEvent(new PointerEvent('pointermove', {
-              clientX: lastX,
-              clientY: lastY,
-              bubbles: false,
-            }))
-          }
-          ticking = false
-        })
-      }
-    }
-    window.addEventListener('pointermove', forwardPointer, { passive: true })
-    return () => window.removeEventListener('pointermove', forwardPointer)
-  }, [])
-
   const isScenePaused = selectedProject !== null || introVisible
 
   return (
@@ -270,7 +236,6 @@ export default function App() {
       {/* Massive Middle-Ground Editorial Parallax Watermark (Kanji & Numerals) */}
       <EditorialWatermark
         activeIndex={activeIndex}
-        scrollProgress={scrollProgress}
         scrollStateRef={scrollStateRef}
         selectedProject={selectedProject}
         onProjectClick={handleProjectClick}
@@ -329,7 +294,6 @@ export default function App() {
       {/* Cybernetic Telemetry HUD */}
       <HUD
         activeIndex={activeIndex}
-        scrollProgress={scrollProgress}
         scrollStateRef={scrollStateRef}
         viewMode={viewMode}
         onViewModeChange={setViewMode}

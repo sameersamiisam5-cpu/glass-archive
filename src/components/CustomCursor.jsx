@@ -131,6 +131,11 @@ export default function CustomCursor({ hoveredIndex, selectedProject, cursorMode
 
     // ── Ultra-Smooth 60+ FPS RAF Loop ───────────────────────────────────────
     const tick = () => {
+      if (document.hidden) {
+        rafId = null
+        return
+      }
+
       const ease = 0.22
       const magnet = targetMagnet.current
 
@@ -175,10 +180,23 @@ export default function CustomCursor({ hoveredIndex, selectedProject, cursorMode
       rafId = requestAnimationFrame(tick)
     }
 
+    const onVisibility = () => {
+      if (document.hidden) {
+        if (rafId) {
+          cancelAnimationFrame(rafId)
+          rafId = null
+        }
+      } else if (!rafId) {
+        rafId = requestAnimationFrame(tick)
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
     rafId = requestAnimationFrame(tick)
 
     return () => {
-      cancelAnimationFrame(rafId)
+      if (rafId) cancelAnimationFrame(rafId)
+      document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('mousedown', onMouseDown)
       window.removeEventListener('mouseup', onMouseUp)

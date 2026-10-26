@@ -4,7 +4,6 @@ import { projects } from '../data/projects.js'
 
 export default function HUD({
   activeIndex,
-  scrollProgress,
   scrollStateRef,
   viewMode,
   onViewModeChange,
@@ -29,7 +28,7 @@ export default function HUD({
   const ticksContainerRef = useRef(null)
   const beamRef = useRef(null)
   const needleRef = useRef(null)
-  const curProgressRef = useRef(scrollProgress || 0)
+  const curProgressRef = useRef(scrollStateRef?.current?.progress || 0)
   const activeSecIdxRef = useRef(activeIndex || 0)
   const isScrubbingRef = useRef(false)
 
@@ -130,7 +129,7 @@ export default function HUD({
         const nativeProgress = window.scrollY / maxScroll
         const targetProgress = typeof scrollStateRef?.current?.progress === 'number'
           ? scrollStateRef.current.progress
-          : (nativeProgress || scrollProgress || 0)
+          : nativeProgress
 
         // Lockstep tracking — perfectly follows the scroll position without latency
         curProgressRef.current = targetProgress
@@ -181,7 +180,7 @@ export default function HUD({
       document.removeEventListener('visibilitychange', onVisibility)
       if (rafId) cancelAnimationFrame(rafId)
     }
-  }, [scrollProgress, scrollStateRef, selectedProject])
+  }, [scrollStateRef, selectedProject])
 
   // ── Scrubber Pointer Scrubbing Interaction ────────────────────────────────
   const handleScrubPointer = (e) => {
@@ -308,7 +307,6 @@ export default function HUD({
 
   const isHidden = selectedProject !== null
   const currentProject = projects[activeIndex] || projects[0]
-  const scrollPct = Math.min(100, Math.max(0, (scrollProgress || 0) * 100))
 
   return (
     <div className={`hud-root ${isHidden ? 'hud-hidden' : ''}`}>

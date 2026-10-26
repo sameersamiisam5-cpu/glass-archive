@@ -136,9 +136,7 @@ function TempleNightWorld({ className = "", isPaused = false }: { className?: st
       }
     });
     intersectionObserver.observe(host);
-    canvas.addEventListener("pointermove", setPointer, { passive: true });
-    canvas.addEventListener("pointerenter", setPointer, { passive: true });
-    canvas.addEventListener("pointerleave", clearPointer, { passive: true });
+    window.addEventListener("pointermove", setPointer, { passive: true });
     window.addEventListener("blur", clearPointer);
     document.addEventListener("visibilitychange", onVisibility);
     resize();
@@ -149,9 +147,7 @@ function TempleNightWorld({ className = "", isPaused = false }: { className?: st
       if (frameRef.current) cancelAnimationFrame(frameRef.current);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
-      canvas.removeEventListener("pointermove", setPointer);
-      canvas.removeEventListener("pointerenter", setPointer);
-      canvas.removeEventListener("pointerleave", clearPointer);
+      window.removeEventListener("pointermove", setPointer);
       window.removeEventListener("blur", clearPointer);
       document.removeEventListener("visibilitychange", onVisibility);
       renderer.dispose();
